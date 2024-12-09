@@ -1,0 +1,25 @@
+services:
+  classrooms-web:
+    container_name: classrooms-web
+    image: classrooms-web
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./:/usr/src/app
+    environment:
+      - NEXTAUTH_URL=http://host.docker.internal:3000/api/auth
+    develop:
+      watch:
+        - action: sync
+          path: ./
+          target: /usr/src/app
+          ignore:
+            - node_modules/
+        - action: rebuild
+          path: package.json
+        - action: rebuild
+          path: ./package.json
