@@ -1,4 +1,4 @@
-import { ChevronUp, Home, Inbox, Settings, User2 } from "lucide-react";
+import { ChevronUp, User2 } from "lucide-react";
 
 import {
   Sidebar,
@@ -19,31 +19,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "./mode-toggle";
+import { User } from "@/utils/types";
+import { student_items, teacher_items } from "@/utils/menu";
 
-// Menu items.
-const items = [
-  {
-    title: "Home",
-    url: "/",
-    icon: Home,
-  },
-  {
-    title: "Lessons",
-    url: "/lessons",
-    icon: Inbox,
-  },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
-];
 interface AppSidebarProps {
-  username: string;
+  user: User;
   onSignOut: () => void;
 }
 
-export function AppSidebar({ username, onSignOut }: AppSidebarProps) {
+export function AppSidebar({ user, onSignOut }: AppSidebarProps) {
   return (
     <Sidebar>
       <SidebarContent>
@@ -51,16 +35,33 @@ export function AppSidebar({ username, onSignOut }: AppSidebarProps) {
           <SidebarGroupLabel>Application</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="text-inherit no-underline">
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {user.role === "STUDENT"
+                ? student_items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <a
+                          href={item.url}
+                          className="text-inherit no-underline"
+                        >
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))
+                : teacher_items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <a
+                          href={item.url}
+                          className="text-inherit no-underline"
+                        >
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -72,7 +73,7 @@ export function AppSidebar({ username, onSignOut }: AppSidebarProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="bg-white dark:bg-black">
-                  <User2 /> {username}
+                  <User2 /> {user.username}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

@@ -17,9 +17,10 @@ import {
   RequireUsernameError,
 } from "@/lib/errors";
 import { toast } from "@/hooks/use-toast";
+import { User } from "@/utils/types";
 
 interface LoginProps {
-  onLogin: (username: string) => void;
+  onLogin: (user: User) => void;
 }
 
 const Login: React.FC<LoginProps> = ({ onLogin }) => {
@@ -38,8 +39,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         throw new RequirePasswordError("Password is required.");
       }
 
-      // Login using http://localhost:3000/auth/login with username and password in the body
-      const res = await fetch("http://localhost:3000/auth/login", {
+      const res = await fetch(`${process.env.API_ENDPOINT}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
@@ -57,7 +57,12 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
         throw new Error("An unknown error has occurred.");
       }
 
-      onLogin(username); // Call onLogin when login is successful
+      const user = await fetch(`${process.env.API_ENDPOINT}/auth/me`, {
+        method: "GET",
+        credentials: "include",
+      }).then((res) => res.json());
+
+      onLogin(user); // Call onLogin when login is successful
     } catch (e) {
       toast({
         title: "Login Error",

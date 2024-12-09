@@ -1,20 +1,18 @@
 import { User } from "@/utils/types";
 import React from "react";
 
-interface HomePageProps {
+interface Props {
   user: User;
 }
 
-const HomePage: React.FC<HomePageProps> = ({ user }) => {
+const ClassesPage: React.FC<Props> = ({ user }) => {
   return (
     <div className="flex items-center justify-center w-full min-h-screen">
       <div className="text-center">
-        <h1 className="text-2xl font-bold mb-4 self-start">
-          Welcome back, {user.first_name}!
-        </h1>
+        <h1 className="text-2xl font-bold mb-4 self-start">Classes</h1>
       </div>
     </div>
   );
 };
 
-export default HomePage;
+export default ClassesPage;

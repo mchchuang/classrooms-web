@@ -4,17 +4,18 @@ import { ThemeProvider } from "@/components/theme-provider";
 import Layout from "./components/layout";
 import Login from "./login";
 import Home from "./pages/Home";
+import Classes from "./pages/Classes";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
+import { User } from "./utils/types";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [username, setUsername] = useState("");
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(user === null);
 
   const checkAuthStatus = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/me", {
+      const res = await fetch(`${process.env.API_ENDPOINT}/auth/me`, {
         method: "GET",
         credentials: "include", // Include cookies in the request
       });
@@ -22,14 +23,16 @@ function App() {
       const data = await res.json();
 
       if (res.ok) {
-        setIsLoggedIn(true);
-        setUsername(data.username);
-      } else {
-        setIsLoggedIn(false);
+        setUser(data);
       }
     } catch (error) {
-      console.error("Error checking auth status:", error);
-      setIsLoggedIn(false);
+      toast({
+        title: "Error checking auth status",
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred.",
+        variant: "destructive",
+      });
+      console.log(error);
     } finally {
       setLoading(false);
     }
@@ -39,30 +42,34 @@ function App() {
     checkAuthStatus();
   }, []);
 
-  const handleLogin = (username: string) => {
-    setIsLoggedIn(true);
-    setUsername(username);
+  const handleLogin = (user: User) => {
+    setUser(user);
+    window.location.href = "/";
   };
 
   const handleSignOut = async () => {
     try {
-      const res = await fetch("http://localhost:3000/auth/logout", {
+      const res = await fetch(`${process.env.API_ENDPOINT}/auth/logout`, {
         method: "GET",
         credentials: "include", // Include cookies in the request
       });
 
       if (res.ok) {
-        setIsLoggedIn(false);
-        setUsername("");
+        setUser(null);
         toast({
           title: "Signed out",
           description: "You have been signed out.",
         });
       } else {
-        console.error("Error signing out");
+        throw Error("An error occurred while signing out.");
       }
     } catch (error) {
-      console.error("Error signing out:", error);
+      toast({
+        title: "Error signing out",
+        description:
+          error instanceof Error ? error.message : "An unknown error occurred.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -73,15 +80,14 @@ function App() {
           <p>Loading...</p>
         ) : (
           <Router>
-            {isLoggedIn ? (
+            {user ? (
               <Routes>
                 <Route
                   path="/"
-                  element={
-                    <Layout username={username} onSignOut={handleSignOut} />
-                  }
+                  element={<Layout user={user} onSignOut={handleSignOut} />}
                 >
-                  <Route index element={<Home />} />
+                  <Route index element={<Home user={user} />} />
+                  <Route path="classes" element={<Classes user={user} />} />
                   {/* Add more routes here */}
                 </Route>
               </Routes>

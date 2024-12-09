@@ -11,7 +11,7 @@ services:
     volumes:
       - ./:/usr/src/app
     environment:
-      - NEXTAUTH_URL=http://host.docker.internal:3000/api/auth
+      - API_ENDPOINT=${API_ENDPOINT}
     develop:
       watch:
         - action: sync
