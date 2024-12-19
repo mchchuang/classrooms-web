@@ -15,7 +15,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ModeToggle } from "./mode-toggle";
@@ -32,7 +31,7 @@ export function AppSidebar({ user, onSignOut }: AppSidebarProps) {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Classroom</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {user.role === "STUDENT"
@@ -86,9 +85,13 @@ export function AppSidebar({ user, onSignOut }: AppSidebarProps) {
                     Account
                   </a>
                 </SidebarMenuButton>
-                <DropdownMenuItem onClick={onSignOut}>
+                <SidebarMenuButton
+                  asChild
+                  onClick={onSignOut}
+                  className="text-red-500 hover:bg-red-300 dark:hover:bg-red-600 cursor-pointer"
+                >
                   <span>Sign out</span>
-                </DropdownMenuItem>
+                </SidebarMenuButton>
               </DropdownMenuContent>
             </DropdownMenu>
           </SidebarMenuItem>

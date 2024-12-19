@@ -8,9 +8,14 @@ import Classes from "./pages/Classes";
 import { Toaster } from "./components/ui/toaster";
 import { toast } from "./hooks/use-toast";
 import { User } from "./utils/types";
+import Account from "./pages/Account";
+import Lessons from "./pages/Lessons";
 
 function App() {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    const storedUser = sessionStorage.getItem("user");
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
   const [loading, setLoading] = useState(user === null);
 
   const checkAuthStatus = async () => {
@@ -24,6 +29,10 @@ function App() {
 
       if (res.ok) {
         setUser(data);
+        sessionStorage.setItem("user", JSON.stringify(data));
+      } else {
+        setUser(null);
+        sessionStorage.removeItem("user");
       }
     } catch (error) {
       toast({
@@ -32,18 +41,20 @@ function App() {
           error instanceof Error ? error.message : "An unknown error occurred.",
         variant: "destructive",
       });
-      console.log(error);
+      setUser(null);
+      sessionStorage.removeItem("user");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    checkAuthStatus();
+    !user ? checkAuthStatus() : setLoading(false);
   }, []);
 
   const handleLogin = (user: User) => {
     setUser(user);
+    sessionStorage.setItem("user", JSON.stringify(user));
     window.location.href = "/";
   };
 
@@ -63,6 +74,7 @@ function App() {
       } else {
         throw Error("An error occurred while signing out.");
       }
+      sessionStorage.removeItem("user");
     } catch (error) {
       toast({
         title: "Error signing out",
@@ -88,6 +100,8 @@ function App() {
                 >
                   <Route index element={<Home user={user} />} />
                   <Route path="classes" element={<Classes user={user} />} />
+                  <Route path="account" element={<Account user={user} />} />
+                  <Route path="lessons" element={<Lessons user={user} />} />
                   {/* Add more routes here */}
                 </Route>
               </Routes>
